@@ -4,6 +4,8 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
+nltk.download('stopwords')
+
 chatbot = pipeline("text-generation", model="distilgpt2")
 
 # pre-process user input
