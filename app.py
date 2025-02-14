@@ -1,13 +1,16 @@
 import streamlit as st
 from transformers import pipeline
 import nltk
+import torch
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+
 
 nltk.download('stopwords')
 nltk.download('punkt_tab')
 
-chatbot = pipeline("text-generation", model="distilgpt2")
+model_name_or_path = "m42-health/Llama3-Med42-8B"
+chatbot = pipeline("text-generation", model=model_name_or_path, torch_dtype = torch.bfloat16, device_map = "auto")
 
 # pre-process user input
 def preprocess_input(user_input):
@@ -26,8 +29,8 @@ def healthcare_chatbot(user_input):
     elif "medication" in user_input:
         return "It's important to take your prescribed medications regularly. If you have concerns, consult a doctor."
     else:
-        response = chatbot(user_input, max_length = 500, num_return_sequences = 1)
-        return response[0]['generated_text']
+        response = chatbot(user_input, max_length = 512, num_return_sequences = 1, temperature = 0.4, top_k = 150, top_p = 0.75)
+        return response[0]['generated_text'][len(user_input) :]
 
 
 # Streamlit Web App Interface
