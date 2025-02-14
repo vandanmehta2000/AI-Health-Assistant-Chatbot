@@ -6,11 +6,10 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 
+generator = pipeline('text-generation', model='gpt2')
+
 nltk.download('stopwords')
 nltk.download('punkt_tab')
-
-model_name_or_path = "m42-health/Llama3-Med42-8B"
-chatbot = pipeline("text-generation", model=model_name_or_path, torch_dtype = torch.bfloat16, device_map = "auto")
 
 # pre-process user input
 def preprocess_input(user_input):
@@ -21,16 +20,16 @@ def preprocess_input(user_input):
 
 # Define healthcare specific response logic
 def healthcare_chatbot(user_input):
-    user_input = preprocess_input(user_input).lower()
-    if "symptom" in user_input:
+    user_input2 = preprocess_input(user_input).lower()
+    if "symptom" in user_input2:
         return "It seems like you are experiencing symptoms. Consult a doctor if symptoms persis."
-    elif "appointment" in user_input:
+    elif "appointment" in user_input2:
         return "Would you like to schedule an appointment with a doctor?"
-    elif "medication" in user_input:
+    elif "medication" in user_input2:
         return "It's important to take your prescribed medications regularly. If you have concerns, consult a doctor."
     else:
-        response = chatbot(user_input, max_length = 512, num_return_sequences = 1, temperature = 0.4, top_k = 150, top_p = 0.75)
-        return response[0]['generated_text'][len(user_input) :]
+        response = generator(user_input, max_length=512, num_return_sequences=1)
+        return response[0]['generated_text']
 
 
 # Streamlit Web App Interface
